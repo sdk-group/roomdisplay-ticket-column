@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iris-polymer-ticketlist/iris-ticketlist.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="roomdisplay-ticket-column">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      
+      iron-icon {}
+    </style>
+    <div class="roomdisplay-column-head">
+      <span>
+        <iron-icon icon="expand-more"></iron-icon>Клиент</span>
+      <span>
+        <iron-icon icon="expand-more"></iron-icon>Окно</span>
+    </div>
+    <iris-ticketlist id="list" hide-head tickets="{{tickets}}" row-model='[[row_model]]'></iris-ticketlist>
+  </template>
+  <script>
+    'use strict'
+    Polymer({
+      is: 'roomdisplay-ticket-column',
+      properties: {
+        tickets: {
+          type: Object,
+          notify: true
+        }
+      },
+      ready() {
+        this.row_model = [{
+          label: "Клиент",
+          field: 'label'
+        }, {
+          label: 'Окно',
+          field: ['destination'],
+          transform: function(ticket) {
+            let dest = ticket.destination;
+
+            return dest.label;
+          }
+        }];
+        this.mock();
+
+        setInterval(() => {
+          this.mock();
+        }, 1000);
+      },
+      mock() {
+        let tickets = [];
+        var possible = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ?";
+        for (let i = 0; i < 5; i += 1) {
+          let ticket = {
+            label: possible.charAt(Math.floor(Math.random() * possible.length)) + _.floor(Math.random() * 100),
+            destination: {
+              label: _.floor(Math.random() * 10)
+            }
+          }
+          tickets.push(ticket);
+        }
+        this.set('tickets', tickets);
+      }
+    });
+  </script>
+</dom-module>
