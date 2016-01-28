@@ -7,18 +7,58 @@
   <template>
     <style>
       :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
       }
       
-      iron-icon {}
+      iron-icon {
+        color: white;
+        background-color: var(--mydoc-brown-400);
+        border-radius: 50%;
+      }
+      
+      .roomdisplay-column-head,
+      .display-row {
+        font-size: 36px;
+        display: flex;
+        flex-direction: row;
+      }
+      
+      span {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        padding: 0 30px;
+      }
+      
+      .display-queue {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+      
+      .display-queue .display-row {
+        flex: 1;
+      }
     </style>
     <div class="roomdisplay-column-head">
       <span>
-        <iron-icon icon="expand-more"></iron-icon>Клиент</span>
+        <iron-icon icon="expand-more"></iron-icon>Клиент
+      </span>
       <span>
-        <iron-icon icon="expand-more"></iron-icon>Окно</span>
+        <iron-icon icon="expand-more"></iron-icon>Окно
+      </span>
     </div>
-    <iris-ticketlist id="list" hide-head tickets="{{tickets}}" row-model='[[row_model]]'></iris-ticketlist>
+
+    <div class="display-queue">
+      <template is="dom-repeat" items="[[tickets]]">
+        <div class="display-row">
+          <span class="ticket-label">[[item.label]]</span>
+          <span class="operator-label">[[item.operator.short_label]]</span>
+        </div>
+      </template>
+    </div>
+
   </template>
   <script>
     'use strict'
@@ -26,9 +66,12 @@
       is: 'roomdisplay-ticket-column',
       properties: {
         tickets: {
-          type: Object,
-          notify: true
+          type: Array,
+          observe: '_tick'
         }
+      },
+      _tick() {
+        console.log('upd');
       },
       ready() {
         this.row_model = [{
@@ -43,11 +86,6 @@
             return dest.label;
           }
         }];
-        this.mock();
-
-        setInterval(() => {
-          this.mock();
-        }, 1000);
       },
       mock() {
         let tickets = [];
