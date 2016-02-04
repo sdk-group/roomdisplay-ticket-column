@@ -22,9 +22,13 @@
       
       .roomdisplay-column-head,
       .display-row {
-        font-size: 36px;
+        font-size: 32px;
         display: flex;
         flex-direction: row;
+      }
+      
+      .display-row {
+        height: 70px;
       }
       
       span {
@@ -77,11 +81,15 @@
       properties: {
         tickets: {
           type: Array,
-          observe: '_tick'
+          value: [],
+          observer: '_tick'
         }
       },
       _tick() {
-        console.log('upd');
+        if (this.tickets && this.tickets.length < 6)
+          for (let i = 0; i < 6 - this.tickets.length; i + 1) {
+            this.unshift('tickets', {});
+          }
       },
       ready() {
         this.row_model = [{
@@ -96,20 +104,6 @@
             return dest.label;
           }
         }];
-      },
-      mock() {
-        let tickets = [];
-        var possible = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ?";
-        for (let i = 0; i < 5; i += 1) {
-          let ticket = {
-            label: possible.charAt(Math.floor(Math.random() * possible.length)) + _.floor(Math.random() * 100),
-            destination: {
-              label: _.floor(Math.random() * 10)
-            }
-          }
-          tickets.push(ticket);
-        }
-        this.set('tickets', tickets);
       }
     });
   </script>
