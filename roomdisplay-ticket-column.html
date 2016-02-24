@@ -65,7 +65,7 @@
     </div>
 
     <div class="display-queue">
-      <template is="dom-repeat" items="[[tickets]]">
+      <template is="dom-repeat" items="[[addEmpty(tickets)]]">
         <div class="display-row">
           <span class="ticket-label">[[item.label]]</span>
           <span class="operator-label">[[item.operator.short_label]]</span>
@@ -86,10 +86,14 @@
         }
       },
       _tick() {
-        if (this.tickets && this.tickets.length < 6)
-          for (let i = 0; i < 6 - this.tickets.length; i + 1) {
-            this.unshift('tickets', {});
-          }
+
+      },
+      addEmpty(tickets) {
+        if (!this.tickets || this.tickets.length >= 6) return tickets;
+        let count = 6 - this.tickets.length;
+        let empty = _.fill(Array(count), {});
+
+        return _.concat(empty, this.tickets);
       },
       ready() {
         this.row_model = [{
