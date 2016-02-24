@@ -7,8 +7,7 @@
   <template>
     <style>
       :host {
-        display: flex;
-        flex-direction: column;
+        @apply(--layout-vertical);
       }
       
       iron-icon {
@@ -23,8 +22,7 @@
       .roomdisplay-column-head,
       .display-row {
         font-size: 32px;
-        display: flex;
-        flex-direction: row;
+        @apply(--layout-horizontal);
       }
       
       .display-row {
@@ -33,15 +31,14 @@
       
       span {
         @apply(--layout-flex-auto);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @apply(--layout);
+        @apply(--layout-center-justified);
+        @apply(--layout-center);
         padding: 0 30px;
       }
       
       .display-queue {
-        display: flex;
-        flex-direction: column-reverse;
+        @apply(--layout-vertical-reverse);
       }
       
       .display-queue .display-row {
