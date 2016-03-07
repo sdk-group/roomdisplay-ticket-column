@@ -7,9 +7,9 @@
   <template>
     <style>
       :host {
-        @apply(--layout-vertical);
+        display: block;
       }
-
+      
       iron-icon {
         color: white;
         background-color: var(--mydoc-brown-400);
@@ -18,59 +18,57 @@
         width: 40px;
         margin-right: 10px;
       }
-
+      
       .roomdisplay-column-head,
       .display-row {
         font-size: 32px;
-        @apply(--layout-horizontal);
       }
-
+      
       .display-row {
         height: 70px;
       }
-
-      span {
-        @apply(--layout-flex-auto);
-        @apply(--layout);
-        @apply(--layout-center-justified);
-        @apply(--layout-center);
+      
+      table {
+        display: inline-block;
+      }
+      
+      th,
+      td {
         padding: 0 30px;
+        text-align: center;
       }
-
-      .display-queue {
-        @apply(--layout-vertical-reverse);
-      }
-
-      .display-queue .display-row {
-        @apply(--layout-flex-auto);
-        @apply(--layout-around-justified);
-      }
-
-      .display-queue span {
+      
+      td span {
         border-bottom: 2px solid var(--mydoc-red-400);
-        max-width: 100px;
+        display: inline-block;
+        margin: 0 auto;
+        width: 150px;
         font-size: 42px;
         flex-basis: 100px;
       }
-
     </style>
-    <div class="roomdisplay-column-head">
-      <span>
-        <iron-icon icon="expand-more"></iron-icon>Клиент
-      </span>
-      <span>
-        <iron-icon icon="expand-more"></iron-icon>Окно
-      </span>
-    </div>
 
-    <div class="display-queue">
-      <template is="dom-repeat" items="[[addEmpty(tickets)]]">
-        <div class="display-row">
-          <span class="ticket-label">[[item.label]]</span>
-          <span class="operator-label">[[item.operator.short_label]]</span>
-        </div>
-      </template>
-    </div>
+
+    <template is="dom-repeat" items="[[splitByColumns(content)]]" as="ticket_col">
+      <table class="roomdisplay-column-head">
+        <tr>
+          <th>
+            <iron-icon icon="expand-more"></iron-icon>Клиент
+          </th>
+          <th>
+            <iron-icon icon="expand-more"></iron-icon>Окно
+          </th>
+        </tr>
+
+        <template is="dom-repeat" items="[[ticket_col]]">
+          <tr class="display-row">
+            <td class="ticket-label"><span>[[item.label]]</span></td>
+            <td class="operator-label"><span>[[item.operator.short_label]]</span></td>
+          </tr>
+        </template>
+
+      </table>
+    </template>
 
   </template>
   <script>
@@ -80,34 +78,48 @@
       properties: {
         tickets: {
           type: Array,
-          value: [],
-          observer: '_tick'
+          value: []
+        },
+        colsCount: {
+          type: Number,
+          value: 2,
+          reflectToAttribute: true
+        },
+        rowsCount: {
+          type: Number,
+          value: 6,
+          reflectToAttribute: true
+        },
+        content: {
+          type: Array,
+          computed: 'computeContent(colsCount, rowsCount,tickets)'
         }
       },
-      _tick() {},
-      addEmpty(tickets) {
-        if (!this.tickets || this.tickets.length >= 6) 
+      splitByColumns(tickets) {
+        return _.chunk(tickets, this.rowsCount);
+      },
+      computeContent(colsCount, rowsCount, tickets) {
+        let total = this.colsCount * this.rowsCount;
+        if (!this.tickets || this.tickets.length >= total)
           return tickets;
-        let count = 6 - this.tickets.length;
+        let count = total - this.tickets.length;
         let empty = _.fill(Array(count), {});
 
-        return _.concat(empty, this.tickets);
+        return _.concat(empty, _.reverse(this.tickets));
       },
       ready() {
-        this.row_model = [
-          {
-            label: "Клиент",
-            field: 'label'
-          }, {
-            label: 'Окно',
-            field: ['destination'],
-            transform: function (ticket) {
-              let dest = ticket.destination;
+        this.row_model = [{
+          label: "Клиент",
+          field: 'label'
+        }, {
+          label: 'Окно',
+          field: ['destination'],
+          transform: function(ticket) {
+            let dest = ticket.destination;
 
-              return dest.label;
-            }
+            return dest.label;
           }
-        ];
+        }];
       }
     });
   </script>
