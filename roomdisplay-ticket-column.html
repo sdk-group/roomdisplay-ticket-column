@@ -34,8 +34,13 @@
       
       th,
       td {
-        padding: 0 30px;
         text-align: center;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      
+      th {
+        padding: 10px 20px;
       }
       
       td span {
@@ -45,6 +50,7 @@
         width: 150px;
         font-size: 42px;
         flex-basis: 100px;
+        height: 57px;
       }
     </style>
 
@@ -75,6 +81,10 @@
     'use strict'
     Polymer({
       is: 'roomdisplay-ticket-column',
+
+      behaviors: [
+        Polymer.IronResizableBehavior
+      ],
       properties: {
         tickets: {
           type: Array,
@@ -86,26 +96,38 @@
           reflectToAttribute: true
         },
         rowsCount: {
-          type: Number,
-          value: 6,
+          type: String,
+          value: 'auto',
           reflectToAttribute: true
         },
         content: {
           type: Array,
-          computed: 'computeContent(colsCount, rowsCount,tickets)'
+          computed: 'computeContent(colsCount, computedRows,tickets)'
         }
       },
-      splitByColumns(tickets) {
-        return _.chunk(tickets, this.rowsCount);
+      listeners: {
+        'iron-resize': 'calcRowsCount'
       },
-      computeContent(colsCount, rowsCount, tickets) {
-        let total = this.colsCount * this.rowsCount;
+      calcRowsCount() {
+        if (this.rowsCount !== 'auto') return this.set("computedRows", this.rowsCount);
+        let rows = _.floor((this.offsetHeight - 100) / 70);
+        this.set("computedRows", rows);
+      },
+      splitByColumns(tickets) {
+        let rows = this.rowsCount == "auto" ? this.computedRows : this.rowsCount;
+        return _.chunk(tickets, rows);
+      },
+      computeContent(colsCount, computedRows, tickets) {
+        this.calcRowsCount();
+        let rows = this.computedRows;
+
+        let total = this.colsCount * rows;
         if (!this.tickets || this.tickets.length >= total)
-          return tickets;
+          return _.slice(tickets, 0, total);
         let count = total - this.tickets.length;
         let empty = _.fill(Array(count), {});
 
-        return _.concat(empty, _.reverse(this.tickets));
+        return _.concat(_.reverse(this.tickets), empty);
       },
       ready() {
         this.row_model = [{
