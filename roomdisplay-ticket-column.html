@@ -30,6 +30,7 @@
       
       table {
         display: inline-block;
+        width: 48%;
       }
       
       th,
@@ -48,9 +49,18 @@
         display: inline-block;
         margin: 0 auto;
         width: 150px;
-        font-size: 42px;
+        font-size: 52px;
         flex-basis: 100px;
         height: 57px;
+        vertical-align: bottom;
+      }
+      
+      .ticket-label {
+        color: var(--iris-ticket-column-ticket-color, --default-primary-color);
+      }
+      
+      .operator-label {
+        color: var(--iris-ticket-column-operator-color, --default-primary-color);
       }
     </style>
 
