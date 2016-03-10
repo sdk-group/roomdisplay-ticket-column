@@ -46,12 +46,10 @@
       
       td span {
         border-bottom: 2px solid var(--mydoc-red-400);
-        display: inline-block;
         margin: 0 auto;
         width: var(--iris-ticket-column-width, 150px);
-        font-size: 52px;
-        flex-basis: 100px;
         height: var(--iris-ticket-column-height, 57px);
+        display: table-cell;
         vertical-align: bottom;
       }
       
@@ -139,7 +137,7 @@
         let count = total - this.tickets.length;
         let empty = _.fill(Array(count), {});
 
-        return _.concat(_.reverse(this.tickets), empty);
+        return _.concat(tickets, empty);
       },
       ready() {
         this.row_model = [{
