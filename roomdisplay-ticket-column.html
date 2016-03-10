@@ -48,18 +48,20 @@
         border-bottom: 2px solid var(--mydoc-red-400);
         display: inline-block;
         margin: 0 auto;
-        width: 150px;
+        width: var(--iris-ticket-column-width, 150px);
         font-size: 52px;
         flex-basis: 100px;
-        height: 57px;
+        height: var(--iris-ticket-column-height, 57px);
         vertical-align: bottom;
       }
       
       .ticket-label {
+        @apply(--iris-ticket-column-ticket-label);
         color: var(--iris-ticket-column-ticket-color, --default-primary-color);
       }
       
       .operator-label {
+        @apply(--iris-ticket-column-operator-label);
         color: var(--iris-ticket-column-operator-color, --default-primary-color);
       }
     </style>
