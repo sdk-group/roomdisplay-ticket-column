@@ -9,7 +9,7 @@
       :host {
         display: block;
       }
-      
+
       iron-icon {
         color: white;
         background-color: var(--mydoc-brown-400);
@@ -18,32 +18,32 @@
         width: 40px;
         margin-right: 10px;
       }
-      
+
       .roomdisplay-column-head,
       .display-row {
         font-size: 32px;
       }
-      
+
       .display-row {
         height: 70px;
       }
-      
+
       table {
         display: inline-block;
         width: 48%;
       }
-      
+
       th,
       td {
         text-align: center;
         padding-left: 20px;
         padding-right: 20px;
       }
-      
+
       th {
         padding: 10px 20px;
       }
-      
+
       td span {
         border-bottom: 2px solid var(--mydoc-red-400);
         margin: 0 auto;
@@ -52,12 +52,12 @@
         display: table-cell;
         vertical-align: bottom;
       }
-      
+
       .ticket-label {
         @apply(--iris-ticket-column-ticket-label);
         color: var(--iris-ticket-column-ticket-color, --default-primary-color);
       }
-      
+
       .operator-label {
         @apply(--iris-ticket-column-operator-label);
         color: var(--iris-ticket-column-operator-color, --default-primary-color);
@@ -113,10 +113,18 @@
         content: {
           type: Array,
           computed: 'computeContent(colsCount, computedRows,tickets)'
+        },
+        filter: {
+          type: Object
         }
       },
       listeners: {
         'iron-resize': 'calcRowsCount'
+      },
+      applyFilter(ticket) {
+        let field = this.filter.field;
+        let value = this.filter.value;
+        return _.get(ticket, field) == value;
       },
       calcRowsCount() {
         if (this.rowsCount !== 'auto') return this.set("computedRows", this.rowsCount);
@@ -125,7 +133,9 @@
       },
       splitByColumns(tickets) {
         let rows = this.rowsCount == "auto" ? this.computedRows : this.rowsCount;
-        return _.chunk(tickets, rows);
+        let filtered = _.isEmpty(this.filter) ? tickets : _.filter(tickets, ticket => this.applyFilter(ticket));
+
+        return _.chunk(filtered, rows);
       },
       computeContent(colsCount, computedRows, tickets) {
         this.calcRowsCount();
