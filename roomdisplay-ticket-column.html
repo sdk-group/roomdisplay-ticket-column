@@ -24,33 +24,41 @@
         font-size: 32px;
       }
 
-      .display-row {
-        height: 70px;
-      }
+      .display-row {}
 
       table {
-        display: inline-block;
-        width: 48%;
+        @apply(--roomdisplay-column-table);
+      }
+
+      #subcaption th {
+        @apply(--roomdisplay-column-subcaption);
       }
 
       th,
       td {
         text-align: center;
-        padding-left: 20px;
-        padding-right: 20px;
+        @apply(--roomdisplay-column-cell);
       }
 
       th {
-        padding: 10px 20px;
+        @apply(--roomdisplay-column-header-cell);
+      }
+
+      tr:nth-child(2n+1) {
+        @apply(--roomdisplay-odd-row);
+      }
+      
+      tr:nth-child(2n) {
+        @apply(--roomdisplay-even-row);
       }
 
       td span {
         border-bottom: 2px solid var(--mydoc-red-400);
         margin: 0 auto;
         width: var(--iris-ticket-column-width, 150px);
-        height: var(--iris-ticket-column-height, 57px);
         display: table-cell;
         vertical-align: bottom;
+        @apply(--roomdisplay-column-inner-cell);
       }
 
       .ticket-label {
@@ -67,14 +75,24 @@
 
     <template is="dom-repeat" items="[[splitByColumns(content)]]" as="ticket_col">
       <table class="roomdisplay-column-head">
-        <tr>
-          <th>
-            <iron-icon icon="expand-more"></iron-icon>Клиент
-          </th>
-          <th>
-            <iron-icon icon="expand-more"></iron-icon>Окно
-          </th>
-        </tr>
+        <template is="dom-if" if="[[showHeader]]">
+          <tr>
+            <th>
+              <iron-icon hidden$="[[!hasIcon]]" icon="expand-more"></iron-icon>Клиент
+            </th>
+            <th>
+              <iron-icon hidden$="[[!hasIcon]]" icon="expand-more"></iron-icon>Окно
+            </th>
+          </tr>
+        </template>
+
+        <template is="dom-if" if="[[subcaption]]">
+          <tr id="subcaption">
+            <th colspan="2">
+              [[subcaption]]
+            </th>
+          </tr>
+        </template>
 
         <template is="dom-repeat" items="[[ticket_col]]">
           <tr class="display-row">
@@ -116,7 +134,16 @@
         },
         filter: {
           type: Object
-        }
+        },
+        showHeader: {
+          type: Boolean,
+          value: false
+        },
+        hasIcon: {
+          type: Boolean,
+          value: false
+        },
+        subcaption: String
       },
       listeners: {
         'iron-resize': 'calcRowsCount'
@@ -133,21 +160,22 @@
       },
       splitByColumns(tickets) {
         let rows = this.rowsCount == "auto" ? this.computedRows : this.rowsCount;
-        let filtered = _.isEmpty(this.filter) ? tickets : _.filter(tickets, ticket => this.applyFilter(ticket));
 
-        return _.chunk(filtered, rows);
+        return _.chunk(tickets, rows);
       },
       computeContent(colsCount, computedRows, tickets) {
         this.calcRowsCount();
         let rows = this.computedRows;
 
         let total = this.colsCount * rows;
-        if (!this.tickets || this.tickets.length >= total)
-          return _.slice(tickets, 0, total);
-        let count = total - this.tickets.length;
+        let filtered = _.isEmpty(this.filter) ? tickets : _.filter(tickets, ticket => this.applyFilter(ticket));
+
+        if (!filtered || filtered.length >= total) return _.slice(filtered, 0, total);
+
+        let count = total - filtered.length;
         let empty = _.fill(Array(count), {});
 
-        return _.concat(tickets, empty);
+        return _.concat(filtered, empty);
       },
       ready() {
         this.row_model = [{
