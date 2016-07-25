@@ -7,7 +7,8 @@
   <template>
     <style>
       :host {
-        display: block;
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
       }
 
       iron-icon {
@@ -24,40 +25,39 @@
         font-size: 32px;
       }
 
-      .display-row {}
-
-      table {
+      .roomdisplay-column-head {
         @apply(--roomdisplay-column-table);
       }
 
-      #subcaption th {
+      #subcaption .column-head {
         @apply(--roomdisplay-column-subcaption);
       }
 
-      th,
-      td {
+      .column-cell,
+      .column-head {
         text-align: center;
         @apply(--roomdisplay-column-cell);
       }
 
-      th {
+      .column-head {
+        @apply(--layout);
+        @apply(--layout-center-center);
         @apply(--roomdisplay-column-header-cell);
       }
 
-      tr:nth-child(2n+1) {
+      .column-row:nth-child(2n+1) {
         @apply(--roomdisplay-odd-row);
       }
-      
-      tr:nth-child(2n) {
+
+      .column-row:nth-child(2n) {
         @apply(--roomdisplay-even-row);
       }
 
-      td span {
+      .display-row .inner-cell {
         border-bottom: 2px solid var(--mydoc-red-400);
         margin: 0 auto;
-        width: var(--iris-ticket-column-width, 150px);
-        display: table-cell;
         vertical-align: bottom;
+        width: 100%;
         @apply(--roomdisplay-column-inner-cell);
       }
 
@@ -70,38 +70,70 @@
         @apply(--iris-ticket-column-operator-label);
         color: var(--iris-ticket-column-operator-color, --default-primary-color);
       }
+
+      .roomdisplay-column-head {
+        @apply(--layout-vertical);
+        @apply(--layout-flex-auto);
+      }
+
+      .column-row {
+        @apply(--layout-horizontal);
+        @apply(--layout-flex-auto);
+      }
+
+      .head-row.column-row {}
+
+      .column-row .column-head {
+        @apply(--layout-flex-auto);
+        max-width: 50%;
+      }
+
+      .column-row .column-cell {
+        @apply(--layout-flex-auto);
+        @apply(--layout);
+        padding: 20px;
+        max-width: 50%;
+      }
+
+      #subcaption.column-row .column-head {
+        max-width: 100%;
+      }
     </style>
 
 
     <template is="dom-repeat" items="[[splitByColumns(content)]]" as="ticket_col">
-      <table class="roomdisplay-column-head">
+      <div class="roomdisplay-column-head">
         <template is="dom-if" if="[[showHeader]]">
-          <tr>
-            <th>
+          <div class="column-row head-row">
+            <div class="column-head">
               <iron-icon hidden$="[[!hasIcon]]" icon="expand-more"></iron-icon>Клиент
-            </th>
-            <th>
+            </div>
+            <div class="column-head">
               <iron-icon hidden$="[[!hasIcon]]" icon="expand-more"></iron-icon>Окно
-            </th>
-          </tr>
+            </div>
+          </div>
         </template>
 
         <template is="dom-if" if="[[subcaption]]">
-          <tr id="subcaption">
-            <th colspan="2">
+          <div class="column-row head-row" id="subcaption">
+            <div class="column-head">
               [[subcaption]]
-            </th>
-          </tr>
+            </div>
+          </div>
         </template>
 
         <template is="dom-repeat" items="[[ticket_col]]">
-          <tr class="display-row">
-            <td class="ticket-label"><span>[[item.label]]</span></td>
-            <td class="operator-label"><span>[[item.workstation.short_label]]</span></td>
-          </tr>
+          <div class="column-row display-row">
+            <div class="column-cell ticket-label">
+              <div class="inner-cell">[[item.label]]</div>
+            </div>
+            <div class="column-cell operator-label">
+              <div class="inner-cell">[[item.workstation.short_label]]</div>
+            </div>
+          </div>
         </template>
 
-      </table>
+      </div>
     </template>
 
   </template>
