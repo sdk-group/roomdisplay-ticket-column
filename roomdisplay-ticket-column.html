@@ -20,8 +20,8 @@
         margin-right: 10px;
       }
 
-      .roomdisplay-column-head,
-      .display-row {
+      .display-row,
+      .roomdisplay-column-head {
         font-size: 32px;
       }
 
@@ -44,11 +44,9 @@
         @apply(--layout-center-center);
         @apply(--roomdisplay-column-header-cell);
       }
-
       .column-row:nth-child(2n+1) {
         @apply(--roomdisplay-odd-row);
       }
-
       .column-row:nth-child(2n) {
         @apply(--roomdisplay-even-row);
       }
@@ -97,8 +95,8 @@
       #subcaption.column-row .column-head {
         max-width: 100%;
       }
-    </style>
 
+    </style>
 
     <template is="dom-repeat" items="[[splitByColumns(content)]]" as="ticket_col">
       <div class="roomdisplay-column-head">
@@ -141,9 +139,7 @@
     Polymer({
       is: 'roomdisplay-ticket-column',
 
-      behaviors: [
-        Polymer.IronResizableBehavior
-      ],
+      behaviors: [Polymer.IronResizableBehavior],
       properties: {
         tickets: {
           type: Array,
@@ -185,23 +181,31 @@
         return _.get(ticket, field) == value;
       },
       calcRowsCount() {
-        if (this.rowsCount !== 'auto') return this.set("computedRows", this.rowsCount);
+        if (this.rowsCount !== 'auto')
+          return this.set("computedRows", this.rowsCount);
         let rows = _.floor((this.offsetHeight - 100) / 70);
         this.set("computedRows", rows);
       },
       splitByColumns(tickets) {
-        let rows = this.rowsCount == "auto" ? this.computedRows : this.rowsCount;
+        let rows = this.rowsCount == "auto"
+          ? this.computedRows
+          : this.rowsCount;
 
         return _.chunk(tickets, rows);
       },
       computeContent(colsCount, computedRows, tickets) {
         this.calcRowsCount();
+        tickets = tickets || [];
+
         let rows = this.computedRows;
-
         let total = this.colsCount * rows;
-        let filtered = _.isEmpty(this.filter) ? tickets : _.filter(tickets, ticket => this.applyFilter(ticket));
 
-        if (!filtered || filtered.length >= total) return _.slice(filtered, 0, total);
+        let filtered = _.isEmpty(this.filter)
+          ? tickets
+          : _.filter(tickets, ticket => this.applyFilter(ticket));
+
+        if (!filtered || filtered.length >= total)
+          return _.slice(filtered, 0, total);
 
         let count = total - filtered.length;
         let empty = _.fill(Array(count), {});
@@ -209,18 +213,20 @@
         return _.concat(filtered, empty);
       },
       ready() {
-        this.row_model = [{
-          label: "Клиент",
-          field: 'label'
-        }, {
-          label: 'Окно',
-          field: ['destination'],
-          transform: function(ticket) {
-            let dest = ticket.destination;
+        this.row_model = [
+          {
+            label: "Клиент",
+            field: 'label'
+          }, {
+            label: 'Окно',
+            field: ['destination'],
+            transform: function (ticket) {
+              let dest = ticket.destination;
 
-            return dest.label;
+              return dest.label;
+            }
           }
-        }];
+        ];
       }
     });
   </script>
